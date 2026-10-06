@@ -1,0 +1,350 @@
+{
+  "A": [
+    {
+      "name": "正しい署名は通る",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "別の秘密で作った偽署名は弾く",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "署名ヘッダーが無いものは弾く",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "本文が途中で書き換えられたら401で拒否",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "拒否したものはキューに入らない",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "B": [
+    {
+      "name": "カテゴリ分類 22/22",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "緊急通知の判定(Pushすべきものだけ鳴らした) 22/22",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "緊急通知は全て5分(300秒)以内",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "C": [
+    {
+      "name": "緊急通知を3回再送されてもLINE Pushは増えない",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "Slackへの投稿も増えない",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "通常の問い合わせの再送でもSlack投稿は増えない",
+      "ok": true,
+      "detail": ""
+    }
+  ],
+  "D": [
+    {
+      "name": "edge-1: キーワードが入っていても 内見 として扱い、営業部長は鳴らさない",
+      "ok": true,
+      "detail": "(分類=内見, Push=False)"
+    },
+    {
+      "name": "edge-2: キーワードが入っていても 賃貸 として扱い、営業部長は鳴らさない",
+      "ok": true,
+      "detail": "(分類=賃貸, Push=False)"
+    },
+    {
+      "name": "AI障害時は安全側(要確認付きで緊急通知)に倒れる",
+      "ok": true,
+      "detail": "(Push=True)"
+    }
+  ],
+  "rows": [
+    {
+      "no": 1,
+      "channel": "line",
+      "text": "駅近の1LDKを探しています。家賃8万円くらいで空いている物件はありますか？",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 2,
+      "channel": "mail",
+      "text": "ペット可の賃貸物件を希望しています。猫2匹飼っています。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 3,
+      "channel": "line",
+      "text": "来月引っ越し予定で、2DK以上の賃貸を探しています。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 4,
+      "channel": "mail",
+      "text": "学生向けの安いアパートはありますか？大学の近くだと助かります。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 5,
+      "channel": "line",
+      "text": "駐車場付きの賃貸マンションを探しています。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 6,
+      "channel": "mail",
+      "text": "オフィス利用できる賃貸物件はありますか？",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 7,
+      "channel": "line",
+      "text": "家賃の更新時期なのですが、条件の良い物件があれば乗り換えたいです。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 8,
+      "channel": "mail",
+      "text": "即入居可の賃貸を探しています。今週中に内見も含めて決めたいです。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 9,
+      "channel": "line",
+      "text": "家具家電付きの賃貸はありますか？単身赴任で短期間の予定です。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 10,
+      "channel": "mail",
+      "text": "女性専用のセキュリティがしっかりした賃貸を探しています。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 11,
+      "channel": "mail",
+      "text": "中古マンションの購入を検討しています。予算3000万円台で良い物件はありますか？",
+      "expected": "売買",
+      "actual": "売買",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 12,
+      "channel": "line",
+      "text": "一戸建ての購入を考えています。住宅ローンの相談もできますか？",
+      "expected": "売買",
+      "actual": "売買",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 13,
+      "channel": "mail",
+      "text": "投資用のワンルームマンションを探しています。利回り重視です。",
+      "expected": "売買",
+      "actual": "売買",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 14,
+      "channel": "line",
+      "text": "所有しているマンションを売却したいのですが、査定をお願いできますか？",
+      "expected": "売買",
+      "actual": "売買",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 15,
+      "channel": "line",
+      "text": "先日問い合わせた港区の物件、週末に内見をお願いできますか？",
+      "expected": "内見",
+      "actual": "内見",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 16,
+      "channel": "mail",
+      "text": "3件ほど気になる物件があるので、まとめて内見したいです。日程調整お願いします。",
+      "expected": "内見",
+      "actual": "内見",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 17,
+      "channel": "line",
+      "text": "明日の午後、空いていれば内見に伺いたいです。",
+      "expected": "内見",
+      "actual": "内見",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 18,
+      "channel": "mail",
+      "text": "オンライン内見は対応していますか？遠方に住んでいます。",
+      "expected": "内見",
+      "actual": "内見",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 19,
+      "channel": "line",
+      "text": "先月入居した部屋のエアコンが効きません。至急対応してください。苦情です。",
+      "expected": "クレーム",
+      "actual": "クレーム",
+      "category_ok": true,
+      "expected_urgent": true,
+      "pushed": true,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 20,
+      "channel": "mail",
+      "text": "契約時の説明と実際の管理状況が違いすぎます。クレームとして正式に申し入れます。",
+      "expected": "クレーム",
+      "actual": "クレーム",
+      "category_ok": true,
+      "expected_urgent": true,
+      "pushed": true,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 21,
+      "channel": "line",
+      "text": "（無関係）今日の天気はどうですか？",
+      "expected": "その他",
+      "actual": "その他",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    },
+    {
+      "no": 22,
+      "channel": "mail",
+      "text": "退去時の敷金精算について教えてください。これは緊急ではありません。",
+      "expected": "賃貸",
+      "actual": "賃貸",
+      "category_ok": true,
+      "expected_urgent": false,
+      "pushed": false,
+      "push_ok": true,
+      "status": "notified"
+    }
+  ],
+  "urgent_latency_sec": [
+    4.620739459991455,
+    4.68097710609436
+  ]
+}

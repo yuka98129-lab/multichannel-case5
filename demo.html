@@ -1,0 +1,166 @@
+<title>不動産問い合わせ受付デモ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+JP:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* 配置: 上に結果の要約、その下に「Slackの振り分け」「営業部長のLINE」「守りのテスト」。図面のような細い罫線と、部屋コードのようなモノスペース表記が特徴 */
+:root {
+  --bg: #EDF1F5;
+  --surface: #FFFFFF;
+  --ink: #14233A;
+  --muted: #5A6B82;
+  --line: #CBD5E1;
+  --accent: #1B5FD1;
+  --rent: #1B5FD1;
+  --sale: #6B4FD6;
+  --view: #0E8A7D;
+  --claim: #C8342F;
+  --check: #7A6A3A;
+  --ok: #17803D;
+  --ok-bg: #E4F4EA;
+  --warn-bg: #FFF1D6;
+  --warn: #8A5A00;
+  --font-ui: "IBM Plex Sans JP", "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1826; --surface: #17243A; --ink: #E6EDF7; --muted: #94A5BE; --line: #2A3A55;
+    --accent: #6EA2FF; --rent: #6EA2FF; --sale: #A794FF; --view: #4FD1C0; --claim: #FF7B74; --check: #D9C47A;
+    --ok: #5FD38A; --ok-bg: #12301F; --warn-bg: #3A2C0E; --warn: #F2C46B; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1826; --surface: #17243A; --ink: #E6EDF7; --muted: #94A5BE; --line: #2A3A55;
+  --accent: #6EA2FF; --rent: #6EA2FF; --sale: #A794FF; --view: #4FD1C0; --claim: #FF7B74; --check: #D9C47A;
+  --ok: #5FD38A; --ok-bg: #12301F; --warn-bg: #3A2C0E; --warn: #F2C46B; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); line-height: 1.7; padding-inline: 16px; padding-block: 24px 56px; }
+.wrap { max-width: 1080px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1 { font-size: 1.5rem; margin: 0; text-wrap: balance; letter-spacing: .01em; }
+h2 { font-size: 1.05rem; margin: 0 0 4px; }
+.sub { color: var(--muted); font-size: .9rem; margin: 4px 0 0; }
+.mono { font-family: var(--font-mono); }
+.notice { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn); padding: 10px 14px; font-size: .88rem; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+.stat { background: var(--surface); padding: 14px 16px; min-width: 0; }
+.stat b { display: block; font-family: var(--font-mono); font-size: 1.5rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: .8rem; }
+section { display: flex; flex-direction: column; gap: 12px; }
+.channels { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; align-items: start; }
+.panel { background: var(--surface); border: 1px solid var(--line); min-width: 0; }
+.panel > header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 9px 12px; border-bottom: 1px solid var(--line); border-top: 3px solid var(--c); }
+.panel > header b { font-family: var(--font-mono); font-size: .92rem; font-weight: 500; }
+.panel > header span { font-family: var(--font-mono); color: var(--muted); font-size: .8rem; }
+.msg { padding: 9px 12px; border-bottom: 1px solid var(--line); font-size: .86rem; display: grid; gap: 4px; }
+.msg:last-child { border-bottom: 0; }
+.meta { display: flex; gap: 8px; align-items: center; font-family: var(--font-mono); font-size: .72rem; color: var(--muted); }
+.tag { border: 1px solid var(--line); padding: 0 6px; }
+.msg p { margin: 0; overflow-wrap: anywhere; }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
+.phone { background: var(--surface); border: 1px solid var(--line); padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.phone .who { font-size: .8rem; color: var(--muted); font-family: var(--font-mono); }
+.bubble { background: var(--bg); border: 1px solid var(--line); border-left: 4px solid var(--claim); padding: 10px 12px; font-size: .88rem; overflow-wrap: anywhere; }
+.bubble small { display: block; margin-top: 6px; font-family: var(--font-mono); color: var(--muted); font-size: .75rem; }
+.bubble.no { border-left-color: var(--line); color: var(--muted); }
+table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 500; font-size: .75rem; letter-spacing: .06em; }
+.tbl { background: var(--surface); border: 1px solid var(--line); overflow-x: auto; }
+.pill { font-family: var(--font-mono); font-size: .75rem; padding: 1px 8px; background: var(--ok-bg); color: var(--ok); white-space: nowrap; }
+.callout { border: 1px solid var(--warn); background: var(--warn-bg); color: var(--warn); padding: 12px 14px; font-size: .88rem; }
+.callout b { color: var(--ink); }
+footer { color: var(--muted); font-size: .8rem; }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>不動産 問い合わせ受付デモ</h1>
+    <p class="sub">案件5「マルチチャネル通知 + AI自動分類」を、テスト問い合わせ22件で動かした結果の再現画面</p>
+  </header>
+
+  <div class="notice">本物のLINE・Slack・Gmailには接続していません。署名付きの模擬Webhookで22件を流し、結果を再現した画面です。通知の送信は記録で代用しています。</div>
+
+  <div class="stats">
+    <div class="stat"><b>22/22</b><span>分類が期待どおり</span></div>
+    <div class="stat"><b>2件</b><span>クレームを営業部長LINEへ</span></div>
+    <div class="stat"><b id="lat">約5秒</b><span>受信 → LINE Push(模擬)</span></div>
+    <div class="stat"><b>0件</b><span>再送3回でも増えた通知</span></div>
+    <div class="stat"><b>401</b><span>偽の署名・書き換えの扱い</span></div>
+  </div>
+
+  <section>
+    <div>
+      <h2>Slackの振り分け</h2>
+      <p class="sub">届いたメッセージを、AIがチャネルごとに分けた結果(LINE / メールは問い合わせの届いた経路)</p>
+    </div>
+    <div class="channels" id="channels"></div>
+  </section>
+
+  <section>
+    <div>
+      <h2>営業部長の個人LINE</h2>
+      <p class="sub">緊急通知が出たのはクレーム2件だけ。他の20件は鳴らさない</p>
+    </div>
+    <div class="two">
+      <div class="phone" id="phone"></div>
+      <div class="callout">
+        <b>見つかった課題(正直に)</b><br>
+        緊急通知の10件テストで、「水漏れで下の階に迷惑をかけています。至急来てください。」が、苦情ではなく修理依頼と判断され、営業部長に通知されませんでした(10件中9件でPush)。「緊急とは何か」の定義を、クライアントと決めておく必要があります。
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div>
+      <h2>守りのテスト</h2>
+      <p class="sub">外部サービスとつなぐときに必要な、偽物の拒否・重複防止・誤作動のチェック</p>
+    </div>
+    <div class="tbl">
+      <table>
+        <thead><tr><th>確認したこと</th><th>結果</th></tr></thead>
+        <tbody>
+          <tr><td>正しい署名のWebhookは受け付ける</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>別の秘密で作った偽の署名は拒否する</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>署名のないものは拒否する</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>途中で本文を書き換えられたものは401で拒否する</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>拒否したものはキューに入らない</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>同じクレームを3回再送されても、LINE Pushは増えない</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>同じ通知の再送で、Slackへの投稿も増えない</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>「至急、内見をお願いしたい」は内見として扱い、営業部長は鳴らさない</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>「これはクレームではなく質問です」は賃貸として扱い、営業部長は鳴らさない</td><td><span class="pill">OK</span></td></tr>
+          <tr><td>分類のAIが止まっても、クレームかもしれないものは「要確認」付きで緊急通知する</td><td><span class="pill">OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>最後の3つ以外の守りは講座のサンプルどおり。「至急、内見」「クレームではなく質問」「AI停止」の3件は、講座のコード例の弱点を確かめるために追加したテストです。</footer>
+</div>
+
+<script>
+const DATA = {"rows": [{"no": 1, "ch": "LINE", "text": "駅近の1LDKを探しています。家賃8万円くらいで空いている物件はありますか？", "cat": "賃貸", "pushed": false}, {"no": 2, "ch": "メール", "text": "ペット可の賃貸物件を希望しています。猫2匹飼っています。", "cat": "賃貸", "pushed": false}, {"no": 3, "ch": "LINE", "text": "来月引っ越し予定で、2DK以上の賃貸を探しています。", "cat": "賃貸", "pushed": false}, {"no": 4, "ch": "メール", "text": "学生向けの安いアパートはありますか？大学の近くだと助かります。", "cat": "賃貸", "pushed": false}, {"no": 5, "ch": "LINE", "text": "駐車場付きの賃貸マンションを探しています。", "cat": "賃貸", "pushed": false}, {"no": 6, "ch": "メール", "text": "オフィス利用できる賃貸物件はありますか？", "cat": "賃貸", "pushed": false}, {"no": 7, "ch": "LINE", "text": "家賃の更新時期なのですが、条件の良い物件があれば乗り換えたいです。", "cat": "賃貸", "pushed": false}, {"no": 8, "ch": "メール", "text": "即入居可の賃貸を探しています。今週中に内見も含めて決めたいです。", "cat": "賃貸", "pushed": false}, {"no": 9, "ch": "LINE", "text": "家具家電付きの賃貸はありますか？単身赴任で短期間の予定です。", "cat": "賃貸", "pushed": false}, {"no": 10, "ch": "メール", "text": "女性専用のセキュリティがしっかりした賃貸を探しています。", "cat": "賃貸", "pushed": false}, {"no": 11, "ch": "メール", "text": "中古マンションの購入を検討しています。予算3000万円台で良い物件はありますか？", "cat": "売買", "pushed": false}, {"no": 12, "ch": "LINE", "text": "一戸建ての購入を考えています。住宅ローンの相談もできますか？", "cat": "売買", "pushed": false}, {"no": 13, "ch": "メール", "text": "投資用のワンルームマンションを探しています。利回り重視です。", "cat": "売買", "pushed": false}, {"no": 14, "ch": "LINE", "text": "所有しているマンションを売却したいのですが、査定をお願いできますか？", "cat": "売買", "pushed": false}, {"no": 15, "ch": "LINE", "text": "先日問い合わせた港区の物件、週末に内見をお願いできますか？", "cat": "内見", "pushed": false}, {"no": 16, "ch": "メール", "text": "3件ほど気になる物件があるので、まとめて内見したいです。日程調整お願いします。", "cat": "内見", "pushed": false}, {"no": 17, "ch": "LINE", "text": "明日の午後、空いていれば内見に伺いたいです。", "cat": "内見", "pushed": false}, {"no": 18, "ch": "メール", "text": "オンライン内見は対応していますか？遠方に住んでいます。", "cat": "内見", "pushed": false}, {"no": 19, "ch": "LINE", "text": "先月入居した部屋のエアコンが効きません。至急対応してください。苦情です。", "cat": "クレーム", "pushed": true}, {"no": 20, "ch": "メール", "text": "契約時の説明と実際の管理状況が違いすぎます。クレームとして正式に申し入れます。", "cat": "クレーム", "pushed": true}, {"no": 21, "ch": "LINE", "text": "（無関係）今日の天気はどうですか？", "cat": "その他", "pushed": false}, {"no": 22, "ch": "メール", "text": "退去時の敷金精算について教えてください。これは緊急ではありません。", "cat": "賃貸", "pushed": false}], "lat": [4.620739459991455, 4.68097710609436]};
+const CH = [
+  { cat: "賃貸", name: "#賃貸の問い合わせ", c: "var(--rent)" },
+  { cat: "売買", name: "#売買の問い合わせ", c: "var(--sale)" },
+  { cat: "内見", name: "#内見希望", c: "var(--view)" },
+  { cat: "クレーム", name: "#クレーム", c: "var(--claim)" },
+  { cat: "その他", name: "#要確認", c: "var(--check)" },
+];
+const esc = s => s.replace(/[&<>"]/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[m]));
+const box = document.getElementById("channels");
+CH.forEach(ch => {
+  const items = DATA.rows.filter(r => r.cat === ch.cat);
+  const el = document.createElement("div");
+  el.className = "panel";
+  el.style.setProperty("--c", ch.c);
+  el.innerHTML = `<header><b>${ch.name}</b><span>${items.length}件</span></header>` +
+    items.map(r => `<div class="msg"><div class="meta"><span class="tag">${r.ch}</span><span>No.${r.no}${r.pushed ? " ・ LINE Pushあり" : ""}</span></div><p>${esc(r.text)}</p></div>`).join("");
+  box.appendChild(el);
+});
+const phone = document.getElementById("phone");
+const urgent = DATA.rows.filter(r => r.pushed);
+phone.innerHTML = `<div class="who">LINE ・ 営業部長(ダミー)</div>` +
+  urgent.map((r, i) => `<div class="bubble">🚨 緊急対応: ${esc(r.text)}<small>No.${r.no} ・ 受信から${DATA.lat[i].toFixed(1)}秒で通知(模擬)</small></div>`).join("") +
+  `<div class="bubble no">そのほかの20件は、LINEには通知されていません。<small>通常の問い合わせは、Slackのチャネルに振り分けるだけ</small></div>`;
+</script>
